@@ -3,32 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>현재 시간과 날짜</title>
+    <title>다기능 시계</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin-top: 50px;
+            margin-top: 20px;
         }
-        #time {
+        .container {
+            margin-bottom: 20px;
+        }
+        .time-display {
             font-size: 24px;
             font-weight: bold;
-            color: #333;
+            margin-top: 10px;
         }
         button {
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
+            margin: 5px;
+        }
+        .controls {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>현재 시간과 날짜를 보여주는 웹 페이지</h1>
-    <button onclick="showTime()">현재 시간과 날짜 보기</button>
-    <div id="time"></div>
+    <h1>다기능 시계</h1>
+
+    <!-- 현재 시간과 날짜 -->
+    <div class="container">
+        <h2>현재 시간과 날짜</h2>
+        <button onclick="updateTime()">현재 시간 보기</button>
+        <div id="current-time" class="time-display"></div>
+    </div>
+
+    <!-- 타이머 -->
+    <div class="container">
+        <h2>타이머</h2>
+        <button onclick="startTimer()">타이머 시작</button>
+        <button onclick="stopTimer()">타이머 정지</button>
+        <button onclick="resetTimer()">타이머 초기화</button>
+        <div id="timer" class="time-display">00:00:00</div>
+    </div>
+
+    <!-- 스톱워치 -->
+    <div class="container">
+        <h2>스톱워치</h2>
+        <button onclick="startStopwatch()">스톱워치 시작</button>
+        <button onclick="stopStopwatch()">스톱워치 정지</button>
+        <button onclick="resetStopwatch()">스톱워치 초기화</button>
+        <div id="stopwatch" class="time-display">00:00:00</div>
+    </div>
+
+    <!-- 세계 시각 -->
+    <div class="container">
+        <h2>세계 시각</h2>
+        <button onclick="updateWorldTime()">세계 시각 보기</button>
+        <div id="world-time" class="time-display"></div>
+    </div>
 
     <script>
-        function showTime() {
+        // 현재 시간과 날짜
+        function updateTime() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
@@ -36,7 +74,84 @@
             const date = now.toLocaleDateString();
             const timeString = `${date} ${hours}:${minutes}:${seconds}`;
             
-            document.getElementById('time').textContent = timeString;
+            document.getElementById('current-time').textContent = timeString;
+        }
+
+        // 타이머
+        let timerInterval;
+        let timerSeconds = 0;
+
+        function startTimer() {
+            if (!timerInterval) {
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    const hours = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+                    const minutes = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+                    const seconds = String(timerSeconds % 60).padStart(2, '0');
+                    document.getElementById('timer').textContent = `${hours}:${minutes}:${seconds}`;
+                }, 1000);
+            }
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            timerSeconds = 0;
+            document.getElementById('timer').textContent = '00:00:00';
+        }
+
+        // 스톱워치
+        let stopwatchInterval;
+        let stopwatchSeconds = 0;
+
+        function startStopwatch() {
+            if (!stopwatchInterval) {
+                stopwatchInterval = setInterval(() => {
+                    stopwatchSeconds++;
+                    const hours = String(Math.floor(stopwatchSeconds / 3600)).padStart(2, '0');
+                    const minutes = String(Math.floor((stopwatchSeconds % 3600) / 60)).padStart(2, '0');
+                    const seconds = String(stopwatchSeconds % 60).padStart(2, '0');
+                    document.getElementById('stopwatch').textContent = `${hours}:${minutes}:${seconds}`;
+                }, 1000);
+            }
+        }
+
+        function stopStopwatch() {
+            clearInterval(stopwatchInterval);
+            stopwatchInterval = null;
+        }
+
+        function resetStopwatch() {
+            clearInterval(stopwatchInterval);
+            stopwatchInterval = null;
+            stopwatchSeconds = 0;
+            document.getElementById('stopwatch').textContent = '00:00:00';
+        }
+
+        // 세계 시각
+        function updateWorldTime() {
+            const now = new Date();
+            const timeZones = {
+                '뉴욕': 'America/New_York',
+                '런던': 'Europe/London',
+                '도쿄': 'Asia/Tokyo',
+                '시드니': 'Australia/Sydney'
+            };
+
+            let worldTimeString = '';
+            for (const [city, timeZone] of Object.entries(timeZones)) {
+                const options = { timeZone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+                const formatter = new Intl.DateTimeFormat([], options);
+                const cityTime = formatter.format(now);
+                worldTimeString += `${city}: ${cityTime}<br>`;
+            }
+
+            document.getElementById('world-time').innerHTML = worldTimeString;
         }
     </script>
 </body>
